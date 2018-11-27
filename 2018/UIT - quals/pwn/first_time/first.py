@@ -32,7 +32,7 @@ def exploit(p):
 if __name__=="__main__":
 
 	if len(sys.argv)<2:
-		p=process('/home/khongtrang/share/2018/pico/attt/solve/first_time/first_time')
+		p=process('./first_time')
 		print util.proc.pidof(p)
 		pause()
 		libc=ELF('/lib/i386-linux-gnu/libc.so.6')
