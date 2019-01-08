@@ -1,3 +1,4 @@
+# source https://github.com/chung96vn/writeup/blob/master/WhiteHat-GrandPrix/joke/explot.py
 import socket
 from pwn import *
 context.clear(arch="amd64")
